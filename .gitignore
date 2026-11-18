@@ -21,3 +21,6 @@ node_modules/
 # 个人配置（含账号、路径等敏感信息，绝不提交）
 *.local.ps1
 config.local.json
+
+# 看门狗运行日志
+watchdog*.log
