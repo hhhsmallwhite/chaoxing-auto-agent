@@ -1,0 +1,23 @@
+# Windows
+Thumbs.db
+Desktop.ini
+*.lnk
+
+# 日志和临时文件
+*.log
+*.tmp
+_*.png
+_screen_probe*.png
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*~
+
+# 依赖
+node_modules/
+
+# 个人配置（含账号、路径等敏感信息，绝不提交）
+*.local.ps1
+config.local.json
