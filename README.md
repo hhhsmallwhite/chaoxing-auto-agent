@@ -137,8 +137,43 @@ powershell -ExecutionPolicy Bypass -File scripts/send-jixu.ps1
 └── scripts/
     ├── check-doubao.ps1           查状态：在跑 / 停了 / 出错
     ├── send-jixu.ps1              往豆包发「继续」（锁屏可用）
+    ├── watchdog.ps1               常驻看门狗，自动检测停顿并发送
     └── inject-player.js           浏览器端防暂停脚本
 ```
+
+### 三种使用方式，按省心程度递增
+
+| 方式 | 怎么做 | 适合 |
+|---|---|---|
+| **手动** | 想起来了就跑一下 `check-doubao.ps1`，停了再跑 `send-jixu.ps1` | 试试看 |
+| **半自动** | 手机遥控 DSH，发一句"看下豆包停了没，停了让它继续" | 日常用 |
+| **全自动** | 后台跑 `watchdog.ps1`，它自己判断、自己发 | 睡觉/出门 |
+
+`watchdog.ps1` 的判定逻辑：
+
+```
+每 60 秒检查一次
+  ├─ 沙箱进程数 = 0 ?          ── 没在干活
+  ├─ 日志静默 > 3 分钟 ?        ── 确实停了（视频监控约 2 分钟写一次）
+  └─ 距上次发送 > 10 分钟 ?     ── 冷却中，防止狂发
+        ↓ 三个都满足
+     调用 send-jixu.ps1 发「继续」
+        ↓ 等 90 秒
+     确认沙箱进程数变成 1 → 记 OK
+     否则 → 记 ERROR，提示排查
+```
+
+跑法：
+
+```powershell
+# 后台常驻（推荐）
+Start-Process powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','watchdog.ps1' -WindowStyle Hidden
+
+# 前台看实时输出（调试用）
+powershell -ExecutionPolicy Bypass -File scripts/watchdog.ps1 -Verbose
+```
+
+全程写 `watchdog.log`，可以事后查它什么时候发了、发了几次、成没成。
 
 ---
 
